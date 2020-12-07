@@ -1,0 +1,44 @@
+<view class="container">
+  <block wx:if="{{show_map}}">
+    <map id="myMap" show-location="true" enable-poi="true" bindtap="move" style="width: 100vw;height: 100vh;"
+      latitude="{{latitude}}" longitude="{{longitude}}" bindmarkertap="go" markers="{{markers}}">
+
+    </map>
+  </block>
+  <image class="imgicon_position" bindtap="back" src="/image/position.png">
+  </image>
+  <image class="imgicon_speak" bindtap="speak" src="/image/mike.png">
+  </image>
+  <image class="imgicon_eat" bindtap="eat" src="/image/eat.png">
+  </image>
+  <image class="imgicon_play" bindtap="play" src="/image/play.png">
+  </image>
+  <image class="imgicon_go" bindtap="go" src="/image/go.png">
+  </image>
+  <image class="imgicon_buy" bindtap="buy" src="/image/buy.png">
+  </image>
+
+  <mp-vtabs wx:if="{{show_place}}" vtabs="{{place}}"  activeTab="{{activeTab}}" bindtabclick="onTabCLick"
+    bindchange="onChange" class="place">
+
+    <checkbox-group bindchange="checkboxChange">
+
+      <mp-vtabs-content wx:for="{{place}}"  wx:key="value" tabIndex="{{index}}">
+        <view class="vtabs-content-item">
+          <label>
+            <mp-cell>
+              {{item.value}}
+              <checkbox class="checkbox" color="#3CB371" value="{{item.id}}"></checkbox>
+            </mp-cell>
+          </label>
+          <image wx:if="{{item.photo_url}}" class="photo" src="{{item.photo_url}}" />
+          <mp-cell wx:else>未找到图片</mp-cell>
+          <mp-cell>
+            <text>距离:{{item.distance}}米 人均{{item.cost?item.cost:'未知'}}元\n开放时间:{{item.time?item.time:'未知'}}</text>
+          </mp-cell>
+        </view>
+      </mp-vtabs-content>
+    </checkbox-group>
+
+  </mp-vtabs>
+</view>

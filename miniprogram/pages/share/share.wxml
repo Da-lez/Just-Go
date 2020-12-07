@@ -1,0 +1,2 @@
+<mp-dialog title="where am i?" show="{{true}}" bindbuttontap="tapDialogButton" buttons="{{[{text: '取消'}, {text: '确认'}]}}">
+</mp-dialog>

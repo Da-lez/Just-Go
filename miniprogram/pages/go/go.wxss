@@ -1,0 +1,130 @@
+
+/* .content {
+  top: 40rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: darkblue;
+  position: fixed;
+  border-style: ridge;
+  border-color: lightsteelblue;
+}
+.content2{
+  top: auto;
+} */
+mp-cell{
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-style: oblique;
+  font-weight: 700;
+}
+page {
+  background-color: #FFFFFF;
+  height: 100%;
+}
+.photo{
+  width: 100%;
+  height: 300rpx;
+}
+
+checkbox .wx-checkbox-input{
+  background-color: #ffffff;
+  border-radius: 50%;/* 圆角 */
+  width: 46rpx; /* 背景的宽 */
+  height: 46rpx; /* 背景的高 */
+}
+/* 选中后的 背景样式 （红色背景 无边框 可根据UI需求自己修改） */
+
+checkbox .wx-checkbox-input.wx-checkbox-input-checked{
+  border: 3rpx solid #3CB371;
+  background:#456ECD;
+}
+/* 选中后的 对勾样式 （白色对勾 可根据UI需求自己修改） */
+checkbox .wx-checkbox-input.wx-checkbox-input-checked::before{
+  border-radius: 50%;/* 圆角 */
+  width: 40rpx;/* 选中后对勾大小，不要超过背景的尺寸 */
+  height: 40rpx;/* 选中后对勾大小，不要超过背景的尺寸 */
+  line-height: 40rpx;
+  text-align: center;
+  font-size:30rpx; /* 对勾大小 30rpx */
+  color:#F8F8FF; /* 对勾颜色 白色 */
+  background: transparent;
+  transform:translate(-50%, -50%) scale(1);
+  -webkit-transform:translate(-50%, -50%) scale(1);
+}
+
+.place{
+  position: fixed;
+  bottom: 200rpx;
+  height: 660rpx;
+  width: 100%;
+}
+
+.vtabs-content-item {
+  width: 100%;
+  height: 620rpx;
+  box-sizing: border-box;
+  border: 4rpx solid rgba(104, 161, 235, 0.705);
+  padding-bottom: 20rpx;
+}
+
+.imgicon_go {
+  position: fixed;
+  width: 80rpx;
+  height: 80rpx;
+  box-shadow: 5rpx 10rpx 50rpx rgba(52, 56, 236, 0.705);
+  border-radius: 80%;
+  bottom: 85rpx;
+  right: 50rpx;
+}
+
+.imgicon_position {
+  position: fixed;
+  width: 80rpx;
+  height: 80rpx;
+  box-shadow: 5rpx 10rpx 50rpx rgba(52, 56, 236, 0.705);
+  border-radius: 80%;
+  top: 85rpx;
+  left: 40rpx;
+}
+
+
+
+.imgicon_eat {
+  position: fixed;
+  width: 80rpx;
+  height: 80rpx;
+  box-shadow: 5rpx 10rpx 50rpx rgba(52, 56, 236, 0.705);
+  border-radius: 80%;
+  bottom: 85rpx;
+  left: 40rpx;
+}
+
+.imgicon_play {
+  position: fixed;
+  width: 80rpx;
+  height: 80rpx;
+  box-shadow: 5rpx 10rpx 50rpx rgba(52, 56, 236, 0.705);
+  border-radius: 80%;
+  bottom: 85rpx;
+  left: 160rpx;
+}
+
+.imgicon_buy {
+  position: fixed;
+  width: 80rpx;
+  height: 80rpx;
+  box-shadow: 5rpx 10rpx 50rpx rgba(52, 56, 236, 0.705);
+  border-radius: 80%;
+  bottom: 85rpx;
+  left: 280rpx;
+}
+
+.imgicon_speak {
+  position: fixed;
+  width: 80rpx;
+  height: 80rpx;
+  box-shadow: 5rpx 10rpx 50rpx rgba(52, 56, 236, 0.705);
+  border-radius: 80%;
+  bottom: 85rpx;
+  left: 400rpx;
+}

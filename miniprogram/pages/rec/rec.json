@@ -1,0 +1,12 @@
+{
+  "navigationBarBackgroundColor": "#456ECD",
+  "navigationBarTextStyle": "white",
+  "navigationBarTitleText": "出行推荐",
+  "usingComponents": {
+    "mp-vtabs": "../../component/vtabs",
+    "mp-vtabs-content": "../../component/vtabs-content",
+    "mp-cell": "/miniprogram_npm/weui-miniprogram/cell/cell",
+    "mp-cells": "/miniprogram_npm/weui-miniprogram/cells/cells"
+  }
+
+}

@@ -1,0 +1,2 @@
+@import '../../component/nullTip/tab.wxss';
+@import '../../component/list/list.wxss';
