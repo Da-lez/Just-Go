@@ -1,7 +1,9 @@
 let key = 'AIEBZ-MUFLJ-6UVFL-K5PEI-LVM56-BMFHJ',
   referer = 'justgo',
   plugin2 = requirePlugin('routePlan');
-const history = wx.cloud.database().collection('history');
+const history = wx.cloud.database().collection('history'),
+  util = require('../../utils/share');;
+const map = wx.cloud.database().collection('map');
 var id = '',
   places = {};
 Page({
@@ -13,6 +15,23 @@ Page({
   data: {
     cells: [],
     show: 'hotest'
+  },
+  onShareAppMessage: function (option) {
+
+    console.log(option);
+
+    let obj = {
+
+      title: 'Just Go!',
+
+      path: 'pages/go/go',
+
+      imageUrl: '../../image/bg.jpg'
+
+    };
+
+    return util.shareEvent(option, obj);
+
   },
   changeViewType: function (e) {
     var data = e.currentTarget.dataset
@@ -38,6 +57,7 @@ Page({
   onLoad: function () {
     this.set_Data1()
     setTimeout(this.set_Data2, 500)
+
     // 监听acceptDataFromOpenerPage事件，获取上一页面通过eventChannel传送到当前页面的数据
   },
   set_Data1: function () {
@@ -53,14 +73,17 @@ Page({
         places = res.data
       }
     })
+
     wx.showToast({
       title: '推荐成功',
     })
   },
   set_Data2: async function () {
     var place = [],
-      str_list = ['餐饮', '娱乐', '购物'];
+      str_list = ['餐饮', '娱乐', '购物'],
+      that = this;
     this.getOpenerEventChannel().on('send', function (data) {
+
       data.list.forEach(e => {
         str_list.forEach(str => {
           for (var i = 0; e != places[str][i].id; i++) {
@@ -72,26 +95,48 @@ Page({
         })
       });
     })
-    let date = new Date().toLocaleDateString();
     place.forEach(e => {
-      e[0].rank += (Math.floor(e[0].rank * Math.random()) % 5)
-      e[0].date = date
-      e[0]._id = id + date + e[0].value
+      that.set_Data(e[0])
     })
     this.setData({
       cells: place
     })
 
-    try {
-      place.forEach(e => {
+
+
+  },
+  set_Data: async function (e) {
+
+    let date = new Date().toLocaleDateString();
+    e.rank += (Math.floor(e.rank * Math.random()) % 5)
+    e.date = date
+    e._id = id + date + e.value
+    await history.where({
+      _id: e._id
+    }).count().then(cnt => {
+      if (!cnt.total)
         history.add({
-          data: e[0]
+          data: e
         })
-      })
-    } catch (error) {
 
-    }
+    })
+    await map.where({
+      _id: e.id
+    }).count().then(cnt => {
+      if (!cnt.total)
+        map.add({
+          data: {
+            _id: e.id,
+            value: e.value,
+            photo_url: e.photo_url,
+            time: e.time,
+            cost: e.cost,
+            location: e.location,
+            rank: e.rank
+          }
+        })
 
+    })
   },
   /**
    * 生命周期函数--监听页面初次渲染完成

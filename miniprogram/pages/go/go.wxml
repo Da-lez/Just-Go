@@ -1,6 +1,6 @@
 <view class="container">
   <block wx:if="{{show_map}}">
-    <map id="myMap" show-location="true" enable-poi="true" bindtap="move" style="width: 100vw;height: 100vh;"
+    <map id="myMap" show-location="true" scale="15" enable-zoom="false" enable-poi="true" bindtap="move" style="width: 100vw;height: 100vh;"
       latitude="{{latitude}}" longitude="{{longitude}}" bindmarkertap="go" markers="{{markers}}">
 
     </map>
@@ -28,7 +28,7 @@
           <label>
             <mp-cell>
               {{item.value}}
-              <checkbox class="checkbox" color="#3CB371" value="{{item.id}}"></checkbox>
+              <checkbox class="checkbox" color="#3CB371" value="{{item.id}}" ></checkbox>
             </mp-cell>
           </label>
           <image wx:if="{{item.photo_url}}" class="photo" src="{{item.photo_url}}" />

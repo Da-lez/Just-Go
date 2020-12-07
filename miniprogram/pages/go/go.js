@@ -1,9 +1,10 @@
 //语音插件
-const history = wx.cloud.database().collection('history');
+const map = wx.cloud.database().collection('map'),
+    util = require('../../utils/share');
 var plugin1 = requirePlugin("WechatSI"),
     QQMap = require('../../utils/qqmap-wx-jssdk');
-let manager = plugin1.getRecordRecognitionManager()
-var places = {
+var manager = plugin1.getRecordRecognitionManager(),
+    places = {
         餐饮: [],
         娱乐: [],
         购物: []
@@ -17,7 +18,8 @@ var places = {
     ],
     qqMap = new QQMap({
         key: 'AIEBZ-MUFLJ-6UVFL-K5PEI-LVM56-BMFHJ'
-    });
+    }),
+    flag = false;
 Page({
     /**
      * 页面的初始数据
@@ -29,33 +31,59 @@ Page({
             iconPath: "/image/run.png",
             width: "60rpx",
             height: "60rpx",
-            latitude: 31.25696587456597,
-            longitude: 121.65518174913194
+            longitude: 120,
+            latitude: 30
         }],
-        latitude: 31.25696587456597,
-        longitude: 121.65518174913194,
         show_map: true,
         place: [],
         show_place: false,
     },
+    /**
 
+    用户点击右上角分享
+
+    */
+
+    onShareAppMessage: function (option) {
+
+        console.log(option);
+
+        let obj = {
+
+            title: 'Just Go!',
+
+            path: 'pages/go/go',
+
+            imageUrl: '../../image/bg.jpg'
+
+        };
+
+        return util.shareEvent(option, obj);
+
+    },
     onLoad: function () {
-
+        var that = this;
         wx.getLocation({
             type: 'gcj02',
-            success: async (res) => {
-                let latitude = Number(res.latitude)
-                let longitude = Number(res.longitude)
-                this.setData({
-                    latitude: latitude,
-                    longitude: longitude,
+            success: res => {
+                that.set_location(Number(res.longitude), Number(res.latitude)).then(() => {
+                    wx.createMapContext('myMap').moveToLocation();
+                    that.set_Data(that.data.longitude, that.data.latitude)
+                }).then(() => {
+                    flag = true
                 });
-                await this.set_Data(longitude, latitude);
-                wx.createMapContext('myMap').moveToLocation();
-            }
+            },
         })
+
     },
-    set_Data: async function (longitude, latitude) {
+    set_location: async function (longitude, latitude) {
+        this.setData({
+            latitude,
+            longitude
+        })
+
+    },
+    set_Data: function (longitude, latitude) {
         var that = this;
         wx.createMapContext('myMap').translateMarker({
             markerId: 1,
@@ -77,11 +105,12 @@ Page({
                 })
             }
         })
-        await this.search_place('餐饮', latitude, longitude, 'http://store.is.autonavi.com/showpic/a33fd948e7fd4379b3a16465a23c18e2')
-        await this.search_place('娱乐', latitude, longitude, 'http://store.is.autonavi.com/showpic/16e65829460632a2a0112a13089e1101')
-        await this.search_place('购物', latitude, longitude, 'http://store.is.autonavi.com/showpic/46e4601217d437bbf73a8a5d0f5af0a3')
+
+        for (let i in places)
+            this.search_place(i, latitude, longitude)
     },
-    search_place: async function (keyword, latitude, longitude, photo_url) {
+    search_place: async function (keyword, latitude, longitude) { //查找地点
+        var that = this;
         qqMap.search({
             keyword: keyword,
             location: {
@@ -91,48 +120,42 @@ Page({
             address_format: 'short',
             page_size: 20,
             auto_extend: 0,
-            success: async function (d) {
+            success: function (d) {
                 var res = d.data
-                for (var i in res) {
-                    await history.where({
-                        id: res[i].id
-                    }).field({
-                        value: true,
-                        _id: false,
-                        photo_url: true,
-                        cost: true,
-                        time: true,
-                        rank: true
-                    }).limit(1).get().then(t_res => {
-                        var data = t_res.data;
-                        if (!data.length) {
-                            places[keyword][i] = {
-                                value: res[i].title.slice(0, 13),
-                                photo_url: photo_url,
-                                cost: '50+',
-                                time: '10:00-20:00',
-                                distance: res[i]._distance,
-                                location: res[i].location,
-                                id: res[i].id,
-                                rank: Math.floor(Math.random() * 80) + 10 - Math.floor(res[i]._distance * Math.random()) % 10
-                            }
-                        } else {
-                            data = data[0]
-                            places[keyword][i] = {
-                                value: data.value,
-                                photo_url: data.photo_url,
-                                cost: data.cost,
-                                time: data.time,
-                                distance: res[i]._distance,
-                                location: res[i].location,
-                                id: res[i].id,
-                                rank: data.rank
-                            }
-                        }
-                    })
-
-                }
+                for (var i in res)
+                    that.check_place(i, keyword, res[i]) //与数据库核对
             }
+        })
+    },
+    check_place: async function (i, keyword, res) {
+        var that = this;
+        await map.where({
+            _id: res.id
+        }).field({
+            value: true,
+            _id: false,
+            photo_url: true,
+            cost: true,
+            time: true,
+            rank: true,
+            id: true
+        }).limit(1).get().then(t_res => {
+            var data = t_res.data;
+            if (!data.length) that.place_init(i, keyword, res, res) //如果数据库中没有
+            else
+                that.place_init(i, keyword, data[0], res)
+        })
+    },
+    place_init: function (i, keyword, data, res) {
+        places[keyword][i] = ({ //数据库中的数据是否存在?否就取默认数据
+            value: data.value ? data.value : data.title.slice(0, 12),
+            photo_url: data.photo_url ? data.photo_url : '',
+            cost: data.cost ? data.cost : '50+',
+            time: data.time ? data.time : '10:10',
+            distance: res._distance,
+            location: res.location,
+            id: res.id,
+            rank: data.rank ? data.rank : Math.floor(Math.random() * 80) + 10 - Math.floor(data._distance * Math.random()) % 10
         })
     },
     onReady: function () {},
@@ -158,38 +181,37 @@ Page({
         })
     },
 
-    go: async function () {
-        var that = this;
-        if (!places['餐饮'].length) {
-            wx.showModal({
-                title: '定位失败啦',
-                content: '请稍等片刻或点击左上角图标开始定位',
-                showCancel: false,
-                confirmText: '好的',
+    go: function () {
+        console.log(flag)
+        if (Math.max(places['娱乐'].length, places['购物'].length, places['餐饮'].length) < 13) {
+            wx.showToast({
+                title: '努力加载中',
+                icon: 'loading'
             })
-            return;
+            return
         }
-        this.checkList('餐饮');
-        this.checkList('购物');
-        this.checkList('娱乐');
-        var list = play_list.concat(eat_list, buy_list).slice(0, 11)
-        wx.setStorage({
-                data: places,
-                key: 'places',
-            }),
-            wx.navigateTo({
-                url: '/pages/rec/rec',
-                success: function (res) {
-                    res.eventChannel.emit('send', {
-                        list: list
-                    })
-                }
-            })
 
+        this.check().then(() => {
+            var list = play_list.concat(eat_list, buy_list).slice(0, 12)
+            wx.setStorage({
+                    data: places,
+                    key: 'places',
+                }),
+                wx.navigateTo({
+                    url: '/pages/rec/rec',
+                    success: function (res) {
+                        res.eventChannel.emit('send', {
+                            list: list
+                        })
+                    }
+                })
+        })
 
     },
-
-    checkList: async function (str) {
+    check: async function () {
+        for (let i in places) this.checkList(i)
+    },
+    checkList: function (str) {
         switch (str) { //绝了
             case '餐饮':
                 list = eat_list
@@ -217,8 +239,15 @@ Page({
     },
 
 
-    move: async function (e) {
-        await this.set_Data(e.detail.longitude, e.detail.latitude);
+    move: function (e) {
+        this.setData({
+            show_place: false
+        })
+        this.set_Data(e.detail.longitude, e.detail.latitude);
+        wx.showToast({
+            title: '搜索地图中',
+            icon: 'loading'
+        })
     },
 
     back: function () {
@@ -265,41 +294,48 @@ Page({
     buy: function () {
         this.get_places('购物')
     },
-    get_places: async function (str) {
-        //t_str用于判断是否重复点击组件
 
-        if (t_str !== str) { //如果是重复点击，重复开关组件
+    onChange: function (e) {
+        console.log(e.detail.index)
+        this.set_place(e.detail.index)
+    },
+    onTabCLick: function (e) {
+        this.set_place(e.detail.index)
+    },
+    //三个窗口点击函数
+    get_places: function (str) {
+        if (places[str].length < 11) {
+            wx.showToast({
+                title: '努力加载中',
+                icon: 'loading'
+            })
+            return
+        }
+        var that = this;
+        //t_str用于判断是否重复点击组件
+        if (t_str !== str) { //如果不是重复点击，进入if更新数据,窗口先关掉再开,否则直接对show_place取反
             this.setData({
-                show_place: false,
                 place: places[str].sort((a, b) => {
                     return a.distance < b.distance
-                })
+                }),
+                show_place: false,
             })
             t_str = str
         }
-        await this.set_place(0)
-        this.setData({
+        this.set_place(0).then(() => that.setData({
             show_place: !(this.data.show_place)
-        })
+        }))
     },
-    onChange: async function (e) {
-        console.log(e.detail.index)
-        await this.set_place(e.detail.index)
-    },
-    onTabCLick: async function (e) {
-        await this.set_place(e.detail.index)
-
-
-    },
+    //place是窗口用于展示的数据,分别为右侧数据和activeTab
     set_place: async function (index) {
-        var that = this,
-            place = this.data.place;
-        var data = places[t_str].filter(v => {
-            return v.id === place[index]['id']
-        })[0];
-        place[index] = data
-
-        that.setData({
+        var place = this.data.place;
+        if (place[index]) {
+            var data = places[t_str].filter(v => {
+                return v.id === place[index]['id']
+            })[0];
+            place[index] = data
+        }
+        this.setData({
             activeTab: index,
             place: place
         })
