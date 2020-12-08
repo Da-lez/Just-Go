@@ -1,0 +1,27 @@
+
+<block wx:for="{{cells}}" wx:for-item="cellsItem" wx:for-index="cellsIndex" wx:key="cells">
+        <view class="cells">
+            <block wx:for="{{cellsItem}}" wx:for-item="cellItem" wx:for-index="cellIndex" wx:key="cells">
+                <view class="cell {{cellItem.access ? 'cell-access' : ''}}" data-type="{{cellItem}}" bindtap="{{cellItem.fn}}">
+                    <view class="cell-bd">{{cellItem.value}}</view>
+                    <view class="cell-ft">{{cellItem.time}}</view>
+                </view>
+            </block>
+        </view>
+    </block>
+<view class="tab">
+  <view class="tab-header">
+    <view class="tab-header-item {{show == 'hotest' ? 'tab-header-active' : ''}}" data-type="hotest"
+      bindtap="changeViewType">人气最高</view>
+    <view class="tab-header-item {{show == 'time_shortest' ? 'tab-header-active' : ''}}" data-type="time_shortest"
+      bindtap="changeViewType">时间最短
+    </view>
+    <view class="tab-header-item {{show == 'cost_least' ? 'tab-header-active' : ''}}" data-type="cost_least"
+      bindtap="changeViewType">花销最低
+    </view>
+    <view class="tab-header-item {{show == 'trip_shortest' ? 'tab-header-active' : ''}}" data-type="trip_shortest"
+      bindtap="changeViewType">行程最近
+    </view>
+  </view>
+
+</view>

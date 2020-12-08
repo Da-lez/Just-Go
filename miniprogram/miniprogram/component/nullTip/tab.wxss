@@ -1,0 +1,42 @@
+page{
+    background-color: #fcfcfc;
+}
+
+.tab-header {
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: table;
+    width: 750rpx;
+    height: 80rpx;
+    background-color: rgb(243, 239, 248);
+    border-bottom: 2px solid #eee;
+}
+
+.tab-header-item {
+    display: table-cell;
+    height: 80rpx;
+    line-height: 80rpx;
+    text-align: center;
+    background-color: #eee;
+}
+
+.tab-header-item:active {
+    background-color: rgb(204, 206, 230);
+}
+
+.tab-header-active {
+    border-bottom: 4rpx solid #47a86c;
+}
+
+.tab-content {
+    margin-top: 80rpx;
+    font-size: x-small;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.tab-content-item {
+    box-sizing: border-box;
+    padding: 30rpx;
+}
